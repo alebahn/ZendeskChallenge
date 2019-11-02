@@ -1,0 +1,22 @@
+{
+  "name": "zendeskchallenge",
+  "version": "1.0.0",
+  "description": "A simple command-line app to demonstrate searching functionality.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Zendesk",
+    "search"
+  ],
+  "author": "Aaron Lebahn",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.12.5",
+    "typescript": "^3.6.4"
+  }
+}
