@@ -1,4 +1,4 @@
-import { SearchableCollection, Searchable } from "../src/model";
+import { SearchableCollection, Searchable } from "../model";
 import { expect } from "chai";
 
 describe("model",function(){
