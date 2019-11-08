@@ -1,8 +1,8 @@
-# Zendesk Callange
+# Zendesk Challenge
 
 ## Installing Prerequisites
 
-Install Node.js and npm
+Install Node.js and npm.
 
 Then, in the checked out git repo run:
 
