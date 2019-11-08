@@ -1,11 +1,8 @@
 # Zendesk Callange
 
-## Pre-requisites
-
-* Node.js
-* npm
-
 ## Installing Prerequisites
+
+Install Node.js and npm
 
 ```
 npm install
