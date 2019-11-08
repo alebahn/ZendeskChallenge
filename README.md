@@ -2,7 +2,7 @@
 
 ## Installing Prerequisites
 
-Install Node.js and npm.
+Install Node.js which includes npm. Node.js can be found at <https://nodejs.org/en/>. Getting the latest LTS should work (12.13.0 as of this file being written). The default options should be fine (as it includes npm).
 
 Then, in the checked out git repo run:
 
