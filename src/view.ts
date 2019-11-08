@@ -1,11 +1,18 @@
 import { question, keyInSelect } from 'readline-sync';
 import { SearchableCollectionCollection, SearchableCollection, Searchable } from './model';
 
+/**
+ * Represents possible menu options besides individual selections
+ */
 enum ControlStatus {
   quit = 'quit',
   back = 'back',
 }
 
+/**
+ * Determine if the value passed is a control value vs a data value
+ * @param value the value to check against the ControlStatus enum
+ */
 function isControllStatus(value: unknown): value is ControlStatus {
   if (typeof value === 'string') {
     return (value in ControlStatus);
@@ -16,10 +23,17 @@ function isControllStatus(value: unknown): value is ControlStatus {
 export class SearchView {
   private searchables: SearchableCollectionCollection;
 
+  /**
+   * Crate a UI to enable the user to search trhough data using a CLI
+   * @param searchables the collections to allow the user to search through
+   */
   public constructor(searchables: SearchableCollectionCollection) {
     this.searchables = searchables;
   }
 
+  /**
+   * Start the UI. Returns when user quits.
+   */
   public run() {
     SearchView.showIntro();
     while (this.searchCollections() !== ControlStatus.quit);
@@ -88,7 +102,13 @@ export class SearchView {
     if (results.length === 0) {
       console.log('No results found for search.');
     } else {
-      console.log(results);
+      console.log('Search Results:\n');
+      results.forEach((result) => {
+        Object.keys(result).forEach((key) => {
+          console.log(`${key}:`, result[key]);
+        });
+        console.log();
+      });
     }
   }
 }
