@@ -1,35 +1,32 @@
-import { readFileSync } from "fs";
-import { SearchView } from "./view";
-import { SearchableCollectionCollection, SearchableCollection, Searchable } from "./model";
+import { readFileSync } from 'fs';
+import { SearchView } from './view';
+import { SearchableCollectionCollection, SearchableCollection, Searchable } from './model';
 
-function loadJSONCollections(searchableFiles : {[key : string] : string}) : SearchableCollectionCollection
-{
-    let results : SearchableCollectionCollection = {};
-    for (var key in searchableFiles) {
-        results[key] = new SearchableCollection(loadJSONCollection(searchableFiles[key]));
-    }
-    return results;
+const searchableFiles = {
+  Users: './users.json',
+  Tickets: './tickets.json',
+  Organizations: './organizations.json',
+};
+
+function loadJSONCollection(filename: string): Searchable[] {
+  const jsonDataSet = readFileSync(filename);
+  return JSON.parse(jsonDataSet.toString());
 }
 
-function loadJSONCollection(filename : string) : Searchable[]
-{
-    const jsonDataSet = readFileSync(filename);
-    return JSON.parse(jsonDataSet.toString());
+function loadJSONCollections(files: { [key: string]: string }): SearchableCollectionCollection {
+  const results: SearchableCollectionCollection = {};
+  Object.keys(searchableFiles).forEach((key) => {
+    results[key] = new SearchableCollection(loadJSONCollection(files[key]));
+  });
+  return results;
 }
 
-function main()
-{
-    const searchableFiles = {
-        "Users": "./users.json",
-        "Tickets": "./tickets.json",
-        "Organizations": "./organizations.json"
-    }
+function main() {
+  const searchables = loadJSONCollections(searchableFiles);
 
-    const searchables = loadJSONCollections(searchableFiles);
+  const searchView = new SearchView(searchables);
 
-    const searchView = new SearchView(searchables);
-
-    searchView.run();
+  searchView.run();
 }
 
 main();
