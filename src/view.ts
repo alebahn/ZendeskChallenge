@@ -72,7 +72,7 @@ export class SearchView {
     const options = searchable.searchableKeys;
     const optionsPlus = options.concat([ControlStatus.quit, ControlStatus.back]);
     console.log('Please select from the following:');
-    console.log('\t' + options.join(', '));
+    console.log(`\t${options.join(', ')}`);
     console.log('or enter "quit" or "back".');
     return question('Select a field to search: ', {
       limit: optionsPlus,
