@@ -4,6 +4,8 @@
 
 Install Node.js and npm
 
+Then, in the checked out git repo run:
+
 ```
 npm install
 ```
