@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import { question, keyInSelect } from 'readline-sync';
 import { SearchView } from './view';
 import { SearchableCollectionCollection, SearchableCollection, Searchable } from './model';
 
@@ -24,9 +25,11 @@ function loadJSONCollections(files: { [key: string]: string }): SearchableCollec
 function main() {
   const searchables = loadJSONCollections(searchableFiles);
 
-  const searchView = new SearchView(searchables);
+  const concreteUI = { question, keyInSelect, log: console.log };
 
-  searchView.run();
+  const searchView = new SearchView(concreteUI);
+
+  searchView.run(searchables);
 }
 
 main();

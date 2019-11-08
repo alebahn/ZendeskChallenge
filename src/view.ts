@@ -1,4 +1,4 @@
-import { question, keyInSelect } from 'readline-sync';
+import { BasicOptions } from 'readline-sync';
 import { SearchableCollectionCollection, SearchableCollection, Searchable } from './model';
 
 /**
@@ -20,94 +20,103 @@ function isControllStatus(value: unknown): value is ControlStatus {
   return false;
 }
 
+// interface to facilitate mocking
+export interface UI
+{
+  question(query?: any, options?: BasicOptions): string;
+  keyInSelect(items: string[], query?: any, options?: BasicOptions): number;
+  log(message?: any, ...optionalParams: any[]): void
+}
+
 export class SearchView {
-  private searchables: SearchableCollectionCollection;
+  private ui : UI;
 
   /**
    * Crate a UI to enable the user to search trhough data using a CLI
-   * @param searchables the collections to allow the user to search through
+   * @param ui an iterface implementing functions needed to be able to interact with the CLI
    */
-  public constructor(searchables: SearchableCollectionCollection) {
-    this.searchables = searchables;
+  public constructor(ui : UI) {
+    this.ui = ui;
   }
 
   /**
    * Start the UI. Returns when user quits.
+   * @param searchables the collections to expose to the user to search through
    */
-  public run() {
-    SearchView.showIntro();
-    while (this.searchCollections() !== ControlStatus.quit);
+  public run(searchables: SearchableCollectionCollection) {
+    this.showIntro();
+    while (this.searchCollections(searchables) !== ControlStatus.quit);
   }
 
-  private static showIntro() {
-    console.log('Welcome to Zendesk Search.');
-    console.log('\tType "back" at any prompt to go to go back.');
-    console.log('\tType "quit" at any prompt to go to quit.');
+  private showIntro() {
+    this.ui.log('Welcome to Zendesk Search.');
+    this.ui.log('\tType "back" at any prompt to go to go back.');
+    this.ui.log('\tType "quit" at any prompt to go to quit.');
   }
 
-  private searchCollections(): ControlStatus {
-    const searchable = this.selectCollection();
+  private searchCollections(searchables : SearchableCollectionCollection): ControlStatus {
+    const searchable = this.selectCollection(searchables);
     if (isControllStatus(searchable)) {
       return searchable;
     }
     let controlStatus: ControlStatus | 'continue';
     do {
-      controlStatus = SearchView.searchCollection(searchable);
+      controlStatus = this.searchCollection(searchable);
     }
     while (controlStatus === 'continue');
     return controlStatus;
   }
 
-  private selectCollection(): SearchableCollection | ControlStatus {
-    const searchableKeys = Object.keys(this.searchables);
-    const collectionIndex = keyInSelect(searchableKeys, 'Select a collection to search: ', { cancel: 'Quit' });
+  private selectCollection(searchables : SearchableCollectionCollection): SearchableCollection | ControlStatus {
+    const searchableKeys = Object.keys(searchables);
+    const collectionIndex = this.ui.keyInSelect(searchableKeys, 'Select a collection to search: ', { cancel: 'Quit' });
     if (collectionIndex === -1) {
       return ControlStatus.quit;
     }
     const collectionName = searchableKeys[collectionIndex];
-    return this.searchables[collectionName];
+    return searchables[collectionName];
   }
 
-  private static searchCollection(searchable: SearchableCollection): ControlStatus | 'continue' {
-    const field = SearchView.selectField(searchable);
+  private searchCollection(searchable: SearchableCollection): ControlStatus | 'continue' {
+    const field = this.selectField(searchable);
     if (isControllStatus(field)) {
       return field;
     }
-    const query = SearchView.getSearchQuery();
+    const query = this.getSearchQuery();
     if (isControllStatus(query)) {
       return query;
     }
     const results = searchable.search(field, query);
-    SearchView.displayResults(results);
+    this.displayResults(results);
     return 'continue';
   }
 
-  private static selectField(searchable: SearchableCollection): string | ControlStatus {
+  private selectField(searchable: SearchableCollection): string | ControlStatus {
     const options = searchable.searchableKeys;
     const optionsPlus = options.concat([ControlStatus.quit, ControlStatus.back]);
-    console.log('Please select from the following:');
-    console.log(`\t${options.join(', ')}`);
-    console.log('or enter "quit" or "back".');
-    return question('Select a field to search: ', {
+    this.ui.log('Please select from the following:');
+    this.ui.log(`\t${options.join(', ')}`);
+    this.ui.log('or enter "quit" or "back".');
+    return this.ui.question('Select a field to search: ', {
       limit: optionsPlus,
       limitMessage: 'Invalid input',
     });
   }
 
-  private static getSearchQuery(): string | ControlStatus {
-    return question('Enter a search query: ');
+  private getSearchQuery(): string | ControlStatus {
+    return this.ui.question('Enter a search query: ');
   }
 
-  private static displayResults(results: Searchable[]) {
+  private displayResults(results: Searchable[]) {
     if (results.length === 0) {
-      console.log('No results found for search.');
+      this.ui.log('No results found for search.');
     } else {
-      console.log('Search Results:\n');
+      this.ui.log('Search Results:\n');
       results.forEach((result) => {
         Object.keys(result).forEach((key) => {
-          console.log(`${key}:`, result[key]);
+          this.ui.log(`${key}:`, result[key]);
         });
-        console.log();
+        this.ui.log();
       });
     }
   }
